@@ -79,7 +79,7 @@ def parse_info(filename):
             if line.startswith("REMARK   2 RESOLUTION.") and method[:5] == "X-RAY":
                 resln = float(re.search(r'[-+]?\d*\.\d+'.strip(), line).group())
                 print("Resolution", resln)
-                resln_grade = Resolution_grade(round(float(resln), 2))
+                resln_grade = calc_resolution_grade(round(float(resln), 2))
                 print(resln_grade)
                 
             if line.startswith("REMARK   3"):
@@ -87,7 +87,7 @@ def parse_info(filename):
                 if re.search(r'.3\s+FREE R VALUE\s+:', line):
                     R_free = re.search(r'[-+]?\d*\.\d+|NULL', line).group()
                     print("R_free:", R_free, type(R_free))
-                    grade = R_free_grade(resln, R_free, rules)
+                    grade = calc_R_free_grade(resln, R_free, rules)
                     print(grade)
                     
                 #### extracting the average B value    
