@@ -24,7 +24,7 @@ grade = {"Resolution": [1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6,
                     0.235, 0.245, 0.250, 0.260, 0.263, 0.266, 0.272,
                     0.275, 0.280, 0.285, 0.290, 0.293, 0.295, 0.297,
                     0.308, 0.310, 0.315, 0.320, 0.330, 0.350]}
-rule = pd.DataFrame(grade, columns=items)
+rules = pd.DataFrame(grade, columns=items)
 
 
 def find_PDB_files(path):
@@ -91,7 +91,8 @@ def parse_info(filename):
             if line.startswith("REMARK   2 RESOLUTION."):
                 resln = float(re.search(r'[-+]?\d*\.\d+', line).group())
                 print("Resolution", resln)
-                resln_grade = Resolution_grade(resln)
+                if 1 <= resln <= 4:
+                    resln_grade = calc_resolution_grade(resln)
                 print(resln_grade)
                 
             if line.startswith("REMARK   3"):
@@ -112,8 +113,8 @@ def parse_info(filename):
                     
                     R_free = float(min(R_free_list))
 
-                    if 1 < resln < 2:
-                        R_free_grade = calc_R_free_grade(resln, R_free)
+                    if 1 <= resln <= 4:
+                        R_free_grade = calc_R_free_grade(resln, R_free, rules)
                     print(R_free_grade)
                     
                 #### extracting the average B value    
