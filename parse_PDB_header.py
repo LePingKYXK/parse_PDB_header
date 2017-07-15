@@ -152,6 +152,8 @@ def main():
         print(begin.format(i, f))
         Method, Resolution, Resolution_grade, \
         R_free, R_free_grade, B_value = parse_info(f)
+        step_time = time.time() - start_time
+        print("\nTime used in this file: {:.3f} Seconds".format(step_time))
 
         PDB_ids.append(os.path.splitext(f)[0].upper())
         Expt_Methods.append(Method)
@@ -173,8 +175,10 @@ def main():
     df.replace("NULL", np.nan, inplace=True)
     df.dropna(inplace=True)
     print("DataFrame:\n",df, df.dropna())
-    print("Used Time: {:.3f} Seconds".format(time.time() - initial_time))
-    df.to_csv("", sep=',')
+    df.to_csv('database.csv', sep=',', index=False)
+    
+    total_time = time.time() - initial_time
+    print("Work Completed. Used Time: {:.3f} Seconds".format(total_time))
     
     
 if __name__ == "__main__":
