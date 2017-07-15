@@ -174,7 +174,8 @@ def main():
 
     df.replace("NULL", np.nan, inplace=True)
     df.dropna(inplace=True)
-    print("DataFrame:\n",df, df.dropna())
+    df.reset_index(drop=True, inplace=True)
+    print("\nDropped NAN\n", df)
     df.to_csv('database.csv', sep=',', index=False)
     
     total_time = time.time() - initial_time
