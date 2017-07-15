@@ -91,8 +91,7 @@ def parse_info(filename):
             if line.startswith("REMARK   2 RESOLUTION."):
                 resln = float(re.search(r'[-+]?\d*\.\d+', line).group())
                 print("Resolution", resln)
-                if 1 <= resln <= 4:
-                    resln_grade = calc_resolution_grade(resln)
+                resln_grade = calc_resolution_grade(resln)
                 print(resln_grade)
                 
             if line.startswith("REMARK   3"):
