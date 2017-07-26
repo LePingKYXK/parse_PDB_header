@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 __author__ = "Huan Wang"
-__version__ = "1.0.0"
+__version__ = "1.1"
 
+
+from decimal import Decimal, ROUND_HALF_UP
 import numpy as np
 import pandas as pd
 import os, re, sys, time
@@ -30,8 +32,17 @@ rules = pd.DataFrame(grade, columns=items)
 def find_PDB_files(path):
     suffix = ".pdb"
     return (f for f in os.listdir(path) if f.endswith(suffix))
+
     
-    
+def deal_round(number, n):
+    ''' Rounded the input number (resolution) to 1 digit decimal.
+    For example, 1.45 is rounded to 1.5.
+    '''
+    val = Decimal(number)
+    acc = str(n)  #### n = 0.1 or 0.01 or 0.001. Here, n = 0.1
+    return float(Decimal(val.quantize(Decimal(acc), rounding=ROUND_HALF_UP)))
+
+
 def calc_resolution_grade(resln):
     if resln < 1.6:
         return "EXCELLENT"
@@ -54,23 +65,28 @@ def calc_resolution_grade(resln):
         
         
 def calc_R_free_grade(resln, R_free, rules):
-    resln = round(resln, 1)
+    rounded = deal_round(resln, 0.1)
 
-    array = rules[rules.Resolution.values == resln]
+    array = rules[rules.Resolution.values == rounded]
     GoodQ  = array.GoodQ.values[0]
     Median = array.Median.values[0]
     BadQ   = array.BadQ.values[0]
     
     if R_free <= (GoodQ - 0.02):
         return "MUCH BETTER THAN AVERAGE at this resolution"
+    
     elif GoodQ < R_free <= ((GoodQ + Median) / 2):
         return "BETTER THAN AVERAGE at this resolution"
-    elif R_free <= ((GoodQ + BadQ) / 2):
+    
+    elif ((GoodQ + Median) / 2) < R_free <= ((Median + BadQ) / 2):
         return "AVERAGE at this resolution"
-    elif R_free <= (BadQ + 0.02):
+    
+    elif ((Median + BadQ) / 2) < R_free <= (BadQ + 0.02):
         return "WORSE THAN AVERAGE at this resolution"
+    
     elif R_free > (BadQ + 0.02):
         return "UNRELIABLE"
+    
     else:
         return None
         
