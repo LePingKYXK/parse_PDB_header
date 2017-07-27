@@ -75,7 +75,7 @@ def calc_R_free_grade(resln, R_free, rules):
     if R_free <= (GoodQ - 0.02):
         return "MUCH BETTER THAN AVERAGE at this resolution"
     
-    elif GoodQ < R_free <= ((GoodQ + Median) / 2):
+    elif (GoodQ - 0.02) < R_free <= ((GoodQ + Median) / 2):
         return "BETTER THAN AVERAGE at this resolution"
     
     elif ((GoodQ + Median) / 2) < R_free <= ((Median + BadQ) / 2):
