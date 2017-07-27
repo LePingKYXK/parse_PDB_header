@@ -11,7 +11,7 @@ For example
 python parse_PDB_header.py
 ~~~
 Then the program will ask you to input the directory that contains the PDB files. 
-<p><span style="color:blue"><em>Please type the directory contains PDB files:</em>   </span>.</p>
+<p><span style="color:blue"><em>Please type the directory contains PDB files:</em>   </span></p>
 
 If you already in that directory, you only need to type `./` as input.
 
