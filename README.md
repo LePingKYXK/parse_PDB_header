@@ -12,7 +12,7 @@ Then the program will ask you to input the directory that contains the PDB files
 For example
 ~~~
 python parse_PDB_header.py
-
+~~~
 <span style="color:blue">Please type the directory contains PDB files:   </span>
 ./
-~~~
+
