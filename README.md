@@ -5,3 +5,13 @@ A `Python 3` script for parsing the header information of PDB files.
 
 ## Parameter used
 `D`: The directory contains the PDB files.
+
+## Usage
+`python parse_PDB_header.py`
+Then the program will ask you to input the directory that contains the PDB files. If you already at the directory, you only need to type `./` as input.
+For example
+~~~
+python parse_PDB_header.py
+~~~
+`Please type the directory contains PDB files: 
+./`
