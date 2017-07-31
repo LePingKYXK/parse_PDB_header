@@ -122,7 +122,7 @@ def parse_info(filename):
     pattern_FREE_R = re.compile(str_FREE_R)
     pattern_B_factor = re.compile(str_B_factor)
     
-    method = resln = resln_grade = R_free = R_free_grade = B_value = np.nan
+    method = resln = resln_grade = R_free = R_free_grade = B_value = "NULL"
 
     with open(filename, 'r') as fo:
         for line in fo:
