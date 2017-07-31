@@ -35,15 +35,31 @@ def find_PDB_files(path):
 
     
 def deal_round(number, n):
-    ''' Rounded the input number (resolution) to 1 digit decimal.
-    For example, 1.45 is rounded to 1.5.
+    ''' Rounded the input number (resolution) to n_th digit decimal. (here 0.1)
+    For example：
+    1.45 is rounded by the function of deal_round("1.45", 0.1),
+    it will return 1.5.
+
+    Pay attention, deal_round(1.45, 0.1) would give wrong result, 1.4!
+    
+    >>> Decimal(1.45)
+    Decimal('1.4499999999999999555910790149937383830547332763671875')
+    
+    >>> Decimal("1.45")
+    Decimal('1.45')
     '''
-    val = Decimal(number)
+    # VERY IMPORTANT!
+    # Here number is a string. It is better to use string type of number!
+    # For example, Decimal instance is created from the string '1.45', 
+    # and is converted straight to base-10.
+    
+    val = Decimal(number)  #### here, number is string type
     acc = str(n)  #### n = 0.1 or 0.01 or 0.001. Here, n = 0.1
     return float(Decimal(val.quantize(Decimal(acc), rounding=ROUND_HALF_UP)))
 
 
 def calc_resolution_grade(resln):
+    resln = float(resln)
     if resln < 1.6:
         return "EXCELLENT"
     elif 1.6 <= resln <= 1.79:
@@ -65,37 +81,48 @@ def calc_resolution_grade(resln):
         
         
 def calc_R_free_grade(resln, R_free, rules):
-    rounded = deal_round(resln, 0.1)
+    '''Note: here resln and R_free are strings '''
+    
+    if R_free.upper() == "NULL":
+        return "NULL"
+    
+    elif 1.0 <= float(resln) <= 3.5:
+        rounded = deal_round(resln, 0.1)
 
-    array = rules[rules.Resolution.values == rounded]
-    GoodQ  = array.GoodQ.values[0]
-    Median = array.Median.values[0]
-    BadQ   = array.BadQ.values[0]
+        array = rules[rules.Resolution.values == rounded]
+        GoodQ  = array.GoodQ.values[0]
+        Median = array.Median.values[0]
+        BadQ   = array.BadQ.values[0]
+        
+        R_free = float(R_free)    
+        if R_free <= (GoodQ - 0.02):
+            return "MUCH BETTER THAN AVERAGE at this resolution"
     
-    if R_free <= (GoodQ - 0.02):
-        return "MUCH BETTER THAN AVERAGE at this resolution"
+        elif (GoodQ - 0.02) < R_free <= ((GoodQ + Median) / 2):
+            return "BETTER THAN AVERAGE at this resolution"
     
-    elif (GoodQ - 0.02) < R_free <= ((GoodQ + Median) / 2):
-        return "BETTER THAN AVERAGE at this resolution"
+        elif ((GoodQ + Median) / 2) < R_free <= ((Median + BadQ) / 2):
+            return "AVERAGE at this resolution"
     
-    elif ((GoodQ + Median) / 2) < R_free <= ((Median + BadQ) / 2):
-        return "AVERAGE at this resolution"
+        elif ((Median + BadQ) / 2) < R_free <= (BadQ + 0.02):
+            return "WORSE THAN AVERAGE at this resolution"
     
-    elif ((Median + BadQ) / 2) < R_free <= (BadQ + 0.02):
-        return "WORSE THAN AVERAGE at this resolution"
+        elif R_free > (BadQ + 0.02):
+            return "UNRELIABLE"
     
-    elif R_free > (BadQ + 0.02):
-        return "UNRELIABLE"
-    
-    else:
-        return None
+        else:
+            return "Error!"
         
         
 def parse_info(filename):
     R_free_list = []
-    str_FREE_R = r"REMARK   3\s+FREE R VALUE\s+:\s+[-+]?\d*\.\d+"
-    str_B_factor = r"REMARK   3\s+MEAN B VALUE\s+\(.+:\s+[-+]?\d*\.\d+"
-    method = resln = resln_grade = R_free = R_free_grade = B_value = "NULL"
+    
+    str_FREE_R = r"3\s+FREE R VALUE(\s+|\s+\(.+\)\s+):\s*(\d+\.\d+|NULL)"
+    str_B_factor = r"3\s+MEAN B VALUE\s+\(.+:\s+([-+]?\d*\.\d+|NULL)"
+    pattern_FREE_R = re.compile(str_FREE_R)
+    pattern_B_factor = re.compile(str_B_factor)
+    
+    method = resln = resln_grade = R_free = R_free_grade = B_value = np.nan
 
     with open(filename, 'r') as fo:
         for line in fo:
@@ -106,38 +133,33 @@ def parse_info(filename):
             #### extracting the highest resolution
             if line.startswith("REMARK   2 RESOLUTION."):
                 resln = float(re.search(r'[-+]?\d*\.\d+', line).group())
-                print("Resolution", resln)
+                print("Resolution:\t".format(resln))
                 resln_grade = calc_resolution_grade(resln)
-                print(resln_grade)
+                print("Resolution grade:\t".format(resln_grade))
                 
+            #### dealing with the R_free value and the average B value    
             if line.startswith("REMARK   3"):
-                clean_list = ['(NO CUTOFF)', '(F>4SIG(F))']
-                for w in clean_list:
-                    if w in line:
-                        line = line.replace(w, ' ')
-                        
+                                        
                 #### extracting the R_free value
-                pattern_FREE_R = re.compile(str_FREE_R)
-                
-                if re.search(pattern_FREE_R, line):
-                    value = line.strip().split()[-1]
-                    print("R_Free value:", value)
+                match_R_free = re.search(pattern_FREE_R, line)
+                if match_R_free:
+                    value = match_R_free.group(2)
+                    print("R_Free value:\t".format(value))
+                    
                     R_free_list.append(value)
                     if len(R_free_list) > 1:
                         print("=== The R_Free LIST ===:", R_free_list)
                     
-                    R_free = float(min(R_free_list))
+                    R_free = min(R_free_list)
 
-                    if 1 <= resln <= 4:
-                        R_free_grade = calc_R_free_grade(resln, R_free, rules)
-                    print(R_free_grade)
+                    R_free_grade = calc_R_free_grade(resln, R_free, rules)
+                    print("R_free_grade:\t".format(R_free_grade))
                     
                 #### extracting the average B value    
-                pattern_B_factor = re.compile(str_B_factor)
-                
-                if re.search(pattern_B_factor, line):
-                    B_value = line.strip().split()[-1]
-                    print("Mean B_value:", B_value)
+                match_B_val = re.search(pattern_B_factor, line)
+                if match_B_val:
+                    B_value = match_B_val.group(1)
+                    print("Mean B_value:\t".format(B_value))
             
             if line.startswith("ATOM"):
                 break
@@ -166,8 +188,10 @@ def main():
         start_time = time.time()
         begin = ''.join(("\n", "-" * 50, "\n", "No. {:}, file {:}"))
         print(begin.format(i, f))
+        
         Method, Resolution, Resolution_grade, \
         R_free, R_free_grade, B_value = parse_info(f)
+        
         step_time = time.time() - start_time
         print("\nTime used in this file: {:.3f} Seconds".format(step_time))
 
@@ -188,10 +212,7 @@ def main():
                                        Mean_B_values)),
                                        columns = title)
 
-    df.replace("NULL", np.nan, inplace=True)
-    df.dropna(inplace=True)
-    df.reset_index(drop=True, inplace=True)
-    print("\nDropped NAN\n", df)
+    print("The Final Table is \n", df)
     df.to_csv('database.csv', sep=',', index=False)
     
     total_time = time.time() - initial_time
