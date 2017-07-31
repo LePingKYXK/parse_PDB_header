@@ -15,3 +15,6 @@ Then the program will ask you to input the directory that contains the PDB files
 
 If you already in that directory, you only need to type `./` as input.
 
+### Acknowledgements
+I thank [Wayne](https://github.com/fomightez) for discussion about the calc_R_free_grade() and deal_round() functions. 
+I also would like to thank [Zachary Ware](http://bugs.python.org/issue24827?@ok_message=msg%20299498%20created%0Aissue%2024827%20message_count%2C%20messages%20edited%20ok&@template=item) for the detailed of the Decimal() function, which published on 2015-08-08 09:36.
