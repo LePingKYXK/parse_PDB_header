@@ -129,13 +129,14 @@ def parse_info(filename):
             #### extracting method information
             if line.startswith("EXPDTA"):
                 method = line[8:].strip()
+                print("Expt. Method:\t{:}".format(method))
 
             #### extracting the highest resolution
             if line.startswith("REMARK   2 RESOLUTION."):
                 resln = float(re.search(r'[-+]?\d*\.\d+', line).group())
-                print("Resolution:\t".format(resln))
+                print("Resolution:\t{:}".format(resln))
                 resln_grade = calc_resolution_grade(resln)
-                print("Resolution grade:\t".format(resln_grade))
+                print("Resolution grade:\t{:}".format(resln_grade))
                 
             #### dealing with the R_free value and the average B value    
             if line.startswith("REMARK   3"):
@@ -144,7 +145,7 @@ def parse_info(filename):
                 match_R_free = re.search(pattern_FREE_R, line)
                 if match_R_free:
                     value = match_R_free.group(2)
-                    print("R_Free value:\t".format(value))
+                    print("R_Free value:\t{:}".format(value))
                     
                     R_free_list.append(value)
                     if len(R_free_list) > 1:
@@ -153,13 +154,13 @@ def parse_info(filename):
                     R_free = min(R_free_list)
 
                     R_free_grade = calc_R_free_grade(resln, R_free, rules)
-                    print("R_free_grade:\t".format(R_free_grade))
+                    print("R_free_grade:\t{:}".format(R_free_grade))
                     
                 #### extracting the average B value    
                 match_B_val = re.search(pattern_B_factor, line)
                 if match_B_val:
                     B_value = match_B_val.group(1)
-                    print("Mean B_value:\t".format(B_value))
+                    print("Mean B_value:\t{:}".format(B_value))
             
             if line.startswith("ATOM"):
                 break
