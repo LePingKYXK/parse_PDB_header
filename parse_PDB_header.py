@@ -169,7 +169,7 @@ def parse_info(filename):
 
 def main():
     pathstr = '\nPlease type the directory contains PDB files: \n'
-    path = input(pathstr)
+    path = input(os.path.normpath(pathstr))
 
     initial_time = time.time()
     pdbfiles = find_PDB_files(path)
@@ -188,7 +188,7 @@ def main():
     for i, f in enumerate(pdbfiles):
         start_time = time.time()
         begin = ''.join(("\n", "-" * 50, "\n", "No. {:}, file {:}"))
-        print(begin.format(i, f))
+        print(begin.format(i + 1, f))
         
         Method, Resolution, Resolution_grade, \
         R_free, R_free_grade, B_value = parse_info(f)
@@ -214,7 +214,8 @@ def main():
                                        columns = title)
 
     print("The Final Table is \n", df)
-    df.to_csv('database.csv', sep=',', index=False)
+    output = ''.join(("database", "_", str(i + 1), "_", "PDB", ".csv"))
+    df.to_csv(output, sep=',', index=False)
     
     total_time = time.time() - initial_time
     print("Work Completed. Used Time: {:.3f} Seconds".format(total_time))
