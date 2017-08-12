@@ -7,7 +7,7 @@ A `Python 3` script for parsing the header information of PDB files.
 
 For examples:
 In `1BRT.pdb`,
-~~~
+<pre>
 REMARK   3  FIT TO DATA USED IN REFINEMENT.                                     
 REMARK   3   CROSS-VALIDATION METHOD          : THROUGHOUT                      
 REMARK   3   FREE R VALUE TEST SET SELECTION  : RANDOM                          
@@ -16,10 +16,10 @@ REMARK   3   FREE R VALUE TEST SET SELECTION  : RANDOM
 REMARK   3   FREE R VALUE                     : 0.164                           
 REMARK   3   FREE R VALUE TEST SET SIZE   (%) : 5.000                           
 REMARK   3   FREE R VALUE TEST SET COUNT      : 2283                            
-~~~
+<\pre>
 
 In `1GPD.pbd`
-~~~
+<pre>
 REMARK   3  FIT TO DATA USED IN REFINEMENT.                                     
 REMARK   3   CROSS-VALIDATION METHOD          : NULL                            
 REMARK   3   FREE R VALUE TEST SET SELECTION  : NULL                            
@@ -39,7 +39,8 @@ REMARK   3    B33 (A**2) : NULL
 REMARK   3    B12 (A**2) : NULL                                                 
 REMARK   3    B13 (A**2) : NULL                                                 
 REMARK   3    B23 (A**2) : NULL                                                 
-~~~
+<\pre>
+
 ## Usage
 
 For example
