@@ -133,7 +133,7 @@ def parse_info(filename):
         for line in fo:
             #### extracting method information
             if line.startswith("EXPDTA"):
-                method = re.search(r'EXPDTA\s+(.+)', line).group(1)
+                method = re.search(r'EXPDTA\s+(.+\w+)', line).group(1)
                 print("Expt. Method:\t{:}".format(method))
 
             #### extracting the highest resolution
@@ -186,7 +186,7 @@ def parse_info(filename):
     return (method, resln, resln_grade, R_value, R_free, R_free_grade, B_value)
 
 
-ef main():
+def main():
     pathstr = '\nPlease type the directory contains PDB files: \n'
     path = input(os.path.normpath(pathstr))
 
