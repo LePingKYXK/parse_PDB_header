@@ -113,7 +113,7 @@ def calc_R_free_grade(resln, R_free, rules):
         else:
             return "Error!"
         
-        
+
 def parse_info(filename):
     R_value_list = []
     R_free_list  = []
@@ -158,7 +158,13 @@ def parse_info(filename):
                 if match_R_free:
                     value = match_R_free.group(2)          
                     R_free_list.append(value)
-
+                  
+                #### extracting the R_free value
+                match_R_free = re.search(pattern_FREE_R, line)
+                if match_R_free:
+                    value = match_R_free.group(2)
+                    R_free_list.append(value)
+                
                 #### extracting the average B value    
                 match_B_val = re.search(pattern_B_factor, line)
                 if match_B_val:
@@ -167,7 +173,7 @@ def parse_info(filename):
             
             if line.startswith("ATOM"):
                 break
-            
+
         R_value = min(R_value_list)
         print("R value:\t{:}".format(R_value))
 
@@ -231,7 +237,8 @@ ef main():
                                        columns = title)
 
     print("The Final Table is \n", df)
-    outname = ''.join(("database", "_", str(i + 1), "_", "PDB", ".csv"))
+
+    outname = ''.join(("database_", str(i + 1), "_PDB", ".csv"))
     output = os.path.join(path, outname)
     df.to_csv(output, sep=',', index=False)
     
