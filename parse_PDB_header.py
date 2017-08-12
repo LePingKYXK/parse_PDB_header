@@ -113,15 +113,15 @@ def calc_R_free_grade(resln, R_free, rules):
         else:
             return "Error!"
         
-        
+
 def parse_info(filename):
     R_value_list = []
     R_free_list  = []
-    
+
     str_R_value  = r"3\s+R VALUE\s+\(.+\)\s+:\s*(\d+\.\d+|NULL)"
     str_FREE_R   = r"3\s+FREE R VALUE(\s+|\s+\(.+\)\s+):\s*(\d+\.\d+|NULL)"
     str_B_factor = r"3\s+MEAN B VALUE\s+\(.+:\s+([-+]?\d*\.\d+|NULL)"
-    
+
     pattern_R_value  = re.compile(str_R_value)
     pattern_FREE_R   = re.compile(str_FREE_R)
     pattern_B_factor = re.compile(str_B_factor)
@@ -146,19 +146,25 @@ def parse_info(filename):
                 
             #### dealing with the R_value, R_free value and the average B value
             if line.startswith("REMARK   3"):
-                
+
                 #### extracting the R_value_Working_set
                 match_R_work = re.search(pattern_R_value, line)
                 if match_R_work:
                     Rvalue = match_R_work.group(1)
                     R_value_list.append(Rvalue)
-                    
+
+                #### extracting the R_free value
+                match_R_free = re.search(pattern_FREE_R, line)
+                if match_R_free:
+                    value = match_R_free.group(2)          
+                    R_free_list.append(value)
+                  
                 #### extracting the R_free value
                 match_R_free = re.search(pattern_FREE_R, line)
                 if match_R_free:
                     value = match_R_free.group(2)
                     R_free_list.append(value)
-                 
+                
                 #### extracting the average B value    
                 match_B_val = re.search(pattern_B_factor, line)
                 if match_B_val:
@@ -167,7 +173,7 @@ def parse_info(filename):
             
             if line.startswith("ATOM"):
                 break
-                
+
         R_value = min(R_value_list)
         print("R value:\t{:}".format(R_value))
 
@@ -180,7 +186,7 @@ def parse_info(filename):
     return (method, resln, resln_grade, R_value, R_free, R_free_grade, B_value)
 
 
-def main():
+ef main():
     pathstr = '\nPlease type the directory contains PDB files: \n'
     path = input(os.path.normpath(pathstr))
 
@@ -203,7 +209,7 @@ def main():
         start_time = time.time()
         begin = ''.join(("\n", "-" * 50, "\n", "No. {:}, file {:}"))
         print(begin.format(i + 1, f))
-        
+
         fname = os.path.join(path, f)
         Method, Resolution, Resolution_grade, \
         R_value, R_free, R_free_grade, B_value = parse_info(fname)
@@ -231,6 +237,7 @@ def main():
                                        columns = title)
 
     print("The Final Table is \n", df)
+
     outname = ''.join(("database_", str(i + 1), "_PDB", ".csv"))
     output = os.path.join(path, outname)
     df.to_csv(output, sep=',', index=False)
