@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 __author__ = "Huan Wang"
-__version__ = "1.1"
+__version__ = "1.2"
 
 
 from decimal import Decimal, ROUND_HALF_UP
@@ -115,47 +115,50 @@ def calc_R_free_grade(resln, R_free, rules):
         
         
 def parse_info(filename):
-    R_free_list = []
-    
-    str_FREE_R = r"3\s+FREE R VALUE(\s+|\s+\(.+\)\s+):\s*(\d+\.\d+|NULL)"
+    R_value_list = []
+    R_free_list  = []
+
+    str_R_value  = r"3\s+R VALUE\s+\(.+\)\s+:\s*(\d+\.\d+|NULL)"
+    str_FREE_R   = r"3\s+FREE R VALUE(\s+|\s+\(.+\)\s+):\s*(\d+\.\d+|NULL)"
     str_B_factor = r"3\s+MEAN B VALUE\s+\(.+:\s+([-+]?\d*\.\d+|NULL)"
-    pattern_FREE_R = re.compile(str_FREE_R)
+
+    pattern_R_value  = re.compile(str_R_value)
+    pattern_FREE_R   = re.compile(str_FREE_R)
     pattern_B_factor = re.compile(str_B_factor)
     
-    method = resln = resln_grade = R_free = R_free_grade = B_value = "NULL"
+    method = resln = resln_grade = R_value =\
+    R_free = R_free_grade = B_value = "NULL"
 
     with open(filename, 'r') as fo:
         for line in fo:
             #### extracting method information
             if line.startswith("EXPDTA"):
-                method = line[8:].strip()
+                method = re.search(r'EXPDTA\s+(.+)', line).group(1)
                 print("Expt. Method:\t{:}".format(method))
 
             #### extracting the highest resolution
             if line.startswith("REMARK   2 RESOLUTION."):
-                resln = float(re.search(r'[-+]?\d*\.\d+', line).group())
+                resln = re.search(r'[-+]?\d*\.\d+', line).group()
                 print("Resolution:\t{:}".format(resln))
+                
                 resln_grade = calc_resolution_grade(resln)
                 print("Resolution grade:\t{:}".format(resln_grade))
                 
-            #### dealing with the R_free value and the average B value    
+            #### dealing with the R_value, R_free value and the average B value
             if line.startswith("REMARK   3"):
-                                        
+
+                #### extracting the R_value_Working_set
+                match_R_work = re.search(pattern_R_value, line)
+                if match_R_work:
+                    Rvalue = match_R_work.group(1)
+                    R_value_list.append(Rvalue)
+
                 #### extracting the R_free value
                 match_R_free = re.search(pattern_FREE_R, line)
                 if match_R_free:
-                    value = match_R_free.group(2)
-                    print("R_Free value:\t{:}".format(value))
-                    
+                    value = match_R_free.group(2)          
                     R_free_list.append(value)
-                    if len(R_free_list) > 1:
-                        print("=== The R_Free LIST ===:", R_free_list)
-                    
-                    R_free = min(R_free_list)
 
-                    R_free_grade = calc_R_free_grade(resln, R_free, rules)
-                    print("R_free_grade:\t{:}".format(R_free_grade))
-                    
                 #### extracting the average B value    
                 match_B_val = re.search(pattern_B_factor, line)
                 if match_B_val:
@@ -164,10 +167,20 @@ def parse_info(filename):
             
             if line.startswith("ATOM"):
                 break
-    return (method, resln, resln_grade, R_free, R_free_grade, B_value)
+            
+        R_value = min(R_value_list)
+        print("R value:\t{:}".format(R_value))
+
+        R_free = min(R_free_list)
+        print("R_Free value:\t{:}".format(value))
+        
+        R_free_grade = calc_R_free_grade(resln, R_free, rules)
+        print("R_free_grade:\t{:}".format(R_free_grade))
+        
+    return (method, resln, resln_grade, R_value, R_free, R_free_grade, B_value)
 
 
-def main():
+ef main():
     pathstr = '\nPlease type the directory contains PDB files: \n'
     path = input(os.path.normpath(pathstr))
 
@@ -179,19 +192,21 @@ def main():
     Expt_Methods  = []
     Resolutions   = []
     Resln_grades  = []
+    R_values      = []
     R_free_values = []
     R_free_grades = []
     Mean_B_values = []
     title = ("PDB_id", "Method", "Resolution", "Resolution Grade",
-             "R_free", "R_free Grade", "Mean B_value")
+             "R_value", "R_free", "R_free Grade", "Mean B_value")
 
     for i, f in enumerate(pdbfiles):
         start_time = time.time()
         begin = ''.join(("\n", "-" * 50, "\n", "No. {:}, file {:}"))
         print(begin.format(i + 1, f))
-        
+
+        fname = os.path.join(path, f)
         Method, Resolution, Resolution_grade, \
-        R_free, R_free_grade, B_value = parse_info(f)
+        R_value, R_free, R_free_grade, B_value = parse_info(fname)
         
         step_time = time.time() - start_time
         print("\nTime used in this file: {:.3f} Seconds".format(step_time))
@@ -200,6 +215,7 @@ def main():
         Expt_Methods.append(Method)
         Resolutions.append(Resolution)
         Resln_grades.append(Resolution_grade)
+        R_values.append(R_value)
         R_free_values.append(R_free)
         R_free_grades.append(R_free_grade)
         Mean_B_values.append(B_value)
@@ -208,13 +224,15 @@ def main():
                                        Expt_Methods,
                                        Resolutions,
                                        Resln_grades,
+                                       R_values,
                                        R_free_values,
                                        R_free_grades,
                                        Mean_B_values)),
                                        columns = title)
 
     print("The Final Table is \n", df)
-    output = ''.join(("database", "_", str(i + 1), "_", "PDB", ".csv"))
+    outname = ''.join(("database", "_", str(i + 1), "_", "PDB", ".csv"))
+    output = os.path.join(path, outname)
     df.to_csv(output, sep=',', index=False)
     
     total_time = time.time() - initial_time
