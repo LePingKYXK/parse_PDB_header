@@ -29,7 +29,7 @@ REMARK   3   FREE R VALUE TEST SET SELECTION  : NULL
 <b>REMARK   3   FREE R VALUE TEST SET SIZE   (%) : NULL   </b>
 REMARK   3   FREE R VALUE TEST SET COUNT      : NULL                            
 REMARK   3   ESTIMATED ERROR OF FREE R VALUE  : NULL     
-
+...
 REMARK   3  B VALUES.                                                           
 REMARK   3   FROM WILSON PLOT           (A**2) : NULL                           
 <b>REMARK   3   MEAN B VALUE      (OVERALL, A**2) : NULL   </b>                      
