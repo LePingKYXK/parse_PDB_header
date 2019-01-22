@@ -3,7 +3,7 @@ A `Python 3` script for parsing the header information of PDB files.
 
   The main purpose of this script is to extract some of the header information, such as `Experiment Method`, `Resolution`, `R value`, `R_free value`, `mean B-factor`, then calculate the grades of Resolution and R_free value based on the [grading of FirstGlance in Jmol](http://bioinformatics.org/firstglance/fgij/notes.htm#grading). Finally, saving above mentioned information as a `.csv` file (Pandas DataFrame). 
 
-***Note**: In some PDB files (due to the complex of the protein's structure and the limitations of the experimental detections), the `R value` and `R_free value` have different data or NULL, even in the same PDB file. The `mean B-factor` some times reported as NULL*
+***Note**: In some PDB files (due to the complex of the protein's structure and the limitations of the experimental detections), the `R value` have different data, even in the same PDB file, or shown as NULL. Similarly for the `R_free value`. In addition, the `mean B-factor` some times reported as NULL*
 
 **For examples:**
 
