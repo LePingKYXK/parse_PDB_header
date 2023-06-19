@@ -45,13 +45,13 @@ REMARK   3    B23 (A**2) : NULL
 ## Usage
 
 For example
-~~~
+```python
 python parse_PDB_header.py
-~~~
+```
 Then the program will ask you to input the directory that contains the PDB files. 
-<p><span style="color:blue"><em>>>>Please type the directory contains PDB files:</em>   </span></p>
+<p><span style="color:blue"><em>>>> Please type the directory contains PDB files: </em>   </span></p>
 
-If you already in that directory, you only need to type `./` as input.
+If you are already in that directory, you only need to type `./` as input.
 
 ### Acknowledgements
 I thank [Wayne](https://github.com/fomightez) for discussion about the `calc_R_free_grade()` and `deal_round()` functions. 
